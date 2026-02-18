@@ -4,16 +4,7 @@ import { blogPosts, BlogPost } from '../lib/blogData';
 import AnimatedSection from './AnimatedSection';
 
 const Blogs: React.FC = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
     const [activePostId, setActivePostId] = useState<string | null>(null);
-
-    const categories = ['ALL', 'MOTIVATIONAL', 'SEO', 'TRENDING', 'EDUCATIONAL', 'PRODUCT'];
-
-    const filteredPosts = useMemo(() => {
-        return selectedCategory === 'ALL'
-            ? blogPosts
-            : blogPosts.filter(post => post.category === selectedCategory);
-    }, [selectedCategory]);
 
     const activePost = useMemo(() => {
         return blogPosts.find(p => p.id === activePostId) || null;
@@ -22,7 +13,7 @@ const Blogs: React.FC = () => {
     const relatedPosts = useMemo(() => {
         if (!activePost) return [];
         return blogPosts
-            .filter(p => p.id !== activePost.id && (p.category === activePost.category || p.id.startsWith('m')))
+            .filter(p => p.id !== activePost.id)
             .slice(0, 3);
     }, [activePost]);
 
@@ -38,30 +29,15 @@ const Blogs: React.FC = () => {
         return (
             <section id="blogs" className="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
                 <div className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-                        <div>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
+                        <div className="mx-auto md:mx-0">
                             <p className="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em] mb-3">Intelligence Hub</p>
                             <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">Latest from SoloPilot</h2>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                            {categories.map(cat => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setSelectedCategory(cat)}
-                                    className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${selectedCategory === cat
-                                            ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20'
-                                            : 'bg-white dark:bg-white/5 text-slate-400 hover:text-cyan-500 border border-slate-200 dark:border-white/5'
-                                        }`}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredPosts.map((post) => (
+                        {blogPosts.map((post) => (
                             <div
                                 key={post.id}
                                 className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden hover:border-cyan-500/30 transition-all group flex flex-col h-full cursor-pointer"
@@ -73,11 +49,6 @@ const Blogs: React.FC = () => {
                                         alt={post.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
-                                    <div className="absolute top-4 left-4">
-                                        <span className="text-[9px] font-black text-white bg-cyan-500 px-2 py-1 rounded uppercase tracking-widest shadow-lg shadow-cyan-500/20">
-                                            {post.category}
-                                        </span>
-                                    </div>
                                 </div>
 
                                 <div className="p-8 flex flex-col flex-1">
@@ -123,9 +94,6 @@ const Blogs: React.FC = () => {
 
                 {/* Article Header */}
                 <div className="mb-12">
-                    <span className="text-[10px] font-black text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full uppercase tracking-[0.2em] mb-6 inline-block">
-                        {activePost.category}
-                    </span>
                     <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-[0.95] mb-8">
                         {activePost.title}
                     </h1>
