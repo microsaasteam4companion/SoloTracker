@@ -3,37 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply dark:bg-slate-950 bg-slate-50 transition-colors duration-500;
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  .light .glass {
+    @apply bg-white/75 border-slate-900/10;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-cyan-600;
   }
 }
 
-@layer utilities {
-  .animate-reveal {
-    animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@layer base {
+  body {
+    @apply dark:bg-slate-950 bg-slate-50 transition-colors duration-500 font-inter antialiased;
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  ::-webkit-scrollbar {
+    @apply w-2;
   }
 
-  .animate-float-slow {
-    animation: float-slow 8s ease-in-out infinite;
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
   }
 
-  @keyframes reveal {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-full;
   }
 
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-
-  @keyframes float-slow {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
+  .light ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200;
   }
 }
