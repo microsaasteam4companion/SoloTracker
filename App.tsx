@@ -18,7 +18,7 @@ import StrategicIntelligence from '@/components/dashboard/StrategicIntelligence'
 import SettingsPage from '@/components/dashboard/SettingsPage';
 import Admin from '@/components/dashboard/Admin';
 import LegalPage from '@/components/LegalPage';
-import { supabase } from './lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
 type View = 'LANDING' | 'AUTH' | 'DASHBOARD' | 'PRIVACY' | 'TERMS' | 'BLOGS';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { analyzeStrategicData, StrategicInsight } from '../../lib/strategic_ai';
+import { analyzeStrategicData, StrategicInsight } from '@/lib/strategic_ai';
 
 type StrategicTab = 'DECISIONS' | 'TRAJECTORY' | 'JOURNAL' | 'SUMMARY';
 
