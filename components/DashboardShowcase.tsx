@@ -55,7 +55,7 @@ const DashboardShowcase: React.FC = () => {
                                     <div className="mt-auto p-2 bg-white/[0.03] border border-white/5 rounded-lg flex items-center gap-2">
                                         <div className="w-6 h-6 rounded bg-gradient-to-br from-cyan-500 to-blue-600"></div>
                                         <div className="flex-1 overflow-hidden">
-                                            <p className="text-[10px] font-bold text-white truncate">nikitasiddharth</p>
+                                            <p className="text-[10px] font-bold text-white truncate">User</p>
                                         </div>
                                     </div>
                                 </aside>
@@ -63,7 +63,7 @@ const DashboardShowcase: React.FC = () => {
                                 {/* REAL MAIN CONTENT RECREATION */}
                                 <main className="flex-1 p-8 overflow-y-auto custom-scrollbar">
                                     <div className="mb-6">
-                                        <h2 className="text-xl font-bold text-white mb-1">Welcome back, <span className="text-cyan-400">nikitasiddharth11</span></h2>
+                                        <h2 className="text-xl font-bold text-white mb-1">Welcome back, <span className="text-cyan-400">User</span></h2>
                                         <p className="text-[10px] text-slate-500">Your cockpit is ready. Focus on the next win.</p>
                                     </div>
 
@@ -130,7 +130,7 @@ const DashboardShowcase: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-0.5">
-                                    <h3 className="text-[10px] md:text-xs font-bold text-white leading-tight">Welcome back, <br /><span className="text-cyan-400">nikitasiddharth11</span></h3>
+                                    <h3 className="text-[10px] md:text-xs font-bold text-white leading-tight">Welcome back, <br /><span className="text-cyan-400">User</span></h3>
                                 </div>
 
                                 {/* Mobile Quote Card */}
