@@ -5,6 +5,7 @@ import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import DashboardShowcase from '@/components/DashboardShowcase';
 import Pricing from '@/components/Pricing';
+import FAQ from '@/components/FAQ';
 import CTA from '@/components/CTA';
 import Blogs from '@/components/Blogs';
 import Footer from '@/components/Footer';
@@ -193,7 +194,7 @@ const App: React.FC = () => {
         <DashboardShowcase />
         <Features />
         <Pricing onStart={() => setView('AUTH')} />
-
+        <FAQ />
       </main>
 
       <Footer onNavigate={(v) => setView(v as View)} />
