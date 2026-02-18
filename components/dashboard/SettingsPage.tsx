@@ -1,85 +1,167 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 interface SettingsPageProps {
-  username: string;
+  user: User;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ username }) => {
+const SettingsPage: React.FC<SettingsPageProps> = ({ user, theme, setTheme }) => {
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setTheme(data.theme || 'dark');
+        setEmailNotifications(data.email_notifications ?? true);
+      }
+    } catch (err) {
+      console.error('Error fetching settings:', err);
+    }
+  };
+
+  const saveSettings = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          theme,
+          email_notifications: emailNotifications,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+      alert('Settings saved successfully!');
+    } catch (err: any) {
+      console.error('Error saving settings:', err);
+      alert(`Failed to save settings: ${err.message || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-10">
-        <h1 className="text-4xl font-black text-cyan-400 mb-2 tracking-tight">Settings</h1>
-        <p className="text-slate-500 text-lg font-medium">Customize your FounderFlow experience</p>
+    <div className="max-w-3xl mx-auto animate-[slideUp_0.5s_ease-out_both]">
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">Settings</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm font-normal">Manage your account and preferences</p>
       </div>
 
-      <div className="glass p-10 rounded-[2.5rem] border-white/5">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="text-white">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      {/* Profile Section */}
+      <div className="bg-white dark:bg-white/[0.03] p-5 md:p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] mb-4">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 dark:bg-cyan-400/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-white">Profile Settings</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Profile</h3>
         </div>
 
-        <form className="space-y-8 max-w-2xl">
+        <div className="space-y-4 max-w-lg">
           <div>
-            <label className="block text-sm font-bold text-slate-400 mb-3">Username</label>
-            <input 
-              type="text" 
-              value={username} 
-              disabled 
-              className="w-full h-14 px-6 bg-slate-900/50 border border-white/5 rounded-2xl text-slate-500 cursor-not-allowed font-medium"
+            <label className="block text-xs text-slate-500 dark:text-slate-500 font-medium mb-2">Username</label>
+            <input
+              type="text"
+              value={user.email?.split('@')[0] || 'User'}
+              disabled
+              className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 rounded-lg text-slate-400 dark:text-slate-500 cursor-not-allowed font-normal text-sm"
             />
-            <p className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-widest ml-1">Username cannot be changed</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-1.5 font-normal ml-0.5">Username cannot be changed</p>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-400 mb-3">Email</label>
-            <input 
-              type="email" 
-              placeholder={`${username}@founder.ai`}
-              className="w-full h-14 px-6 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 font-medium"
+            <label className="block text-xs text-slate-500 dark:text-slate-500 font-medium mb-2">Email</label>
+            <input
+              type="email"
+              value={user.email || ''}
+              disabled
+              className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-lg text-slate-400 dark:text-white font-normal text-sm cursor-not-allowed"
             />
           </div>
+        </div>
+      </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-400 mb-3">Timezone</label>
-            <select className="w-full h-14 px-6 bg-slate-900 border border-white/5 rounded-2xl text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50 font-medium appearance-none">
-              <option>UTC</option>
-              <option>EST</option>
-              <option>PST</option>
-              <option>IST</option>
-            </select>
+      {/* Preferences Section */}
+      <div className="bg-white dark:bg-white/[0.03] p-5 md:p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] mb-4">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-purple-500/10 dark:bg-purple-400/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+          </div>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Preferences</h3>
+        </div>
+
+        <div className="space-y-3 max-w-lg">
+          <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-white/5">
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white mb-0.5">Email Notifications</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 font-normal">Updates about goals and sessions</p>
+            </div>
+            <button
+              onClick={() => setEmailNotifications(!emailNotifications)}
+              className={`w-10 h-5 rounded-full transition-all flex-shrink-0 ${emailNotifications ? 'bg-cyan-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${emailNotifications ? 'translate-x-5' : 'translate-x-0.5'}`}></div>
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-400 mb-3">Target Market</label>
-            <select className="w-full h-14 px-6 bg-slate-900 border border-white/5 rounded-2xl text-white focus:outline-none focus:ring-1 focus:ring-cyan-400/50 font-medium appearance-none">
-              <option>United States</option>
-              <option>Europe</option>
-              <option>Asia</option>
-              <option>Global</option>
-            </select>
-            <p className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-widest ml-1">Helps optimize posting times for your audience</p>
+          <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-white/5">
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-white mb-0.5">Theme</p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 font-normal">Choose color scheme</p>
+            </div>
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg text-xs font-medium text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+            >
+              {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+            </button>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-400 mb-3">Hourly Rate ($)</label>
-            <input 
-              type="number" 
-              defaultValue="0"
-              className="w-full h-14 px-6 bg-slate-900 border border-white/5 rounded-2xl text-white placeholder-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-400/50 font-medium"
-            />
-            <p className="text-[10px] text-slate-600 mt-2 font-bold uppercase tracking-widest ml-1">Used for Dollar-per-Hour tracking</p>
-          </div>
-
-          <button className="h-14 px-10 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-95 flex items-center gap-3">
-             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
-             Save Settings
-          </button>
-        </form>
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <button
+          onClick={saveSettings}
+          disabled={loading}
+          className="h-10 px-6 bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-400 text-white font-medium rounded-lg transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              Save Settings
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

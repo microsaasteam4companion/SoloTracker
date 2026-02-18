@@ -1,139 +1,310 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
+import { User } from '@supabase/supabase-js';
 
-const WeeklyGoals: React.FC = () => {
+interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  time_budget: number;
+  category: string;
+  priority: string;
+  completed: boolean;
+  progress: number;
+  created_at: string;
+}
+
+interface WeeklyGoalsProps {
+  user: User;
+}
+
+const WeeklyGoals: React.FC<WeeklyGoalsProps> = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
-  const days = [
-    { name: 'Sun', date: 8 },
-    { name: 'Mon', date: 9 },
-    { name: 'Tue', date: 10 },
-    { name: 'Wed', date: 11 },
-    { name: 'Thu', date: 12 },
-    { name: 'Fri', date: 13 },
-    { name: 'Sat', date: 14, active: true },
-  ];
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
+  const [budget, setBudget] = useState('');
+  const [quickTask, setQuickTask] = useState('');
+
+  const fetchGoals = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('weekly_goals')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setGoals(data || []);
+    } catch (err) {
+      console.error('Error fetching goals:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user.id]);
+
+  useEffect(() => {
+    fetchGoals();
+  }, [fetchGoals]);
+
+  const addGoal = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const finalTitle = title || quickTask;
+    if (!finalTitle) return;
+
+    try {
+      const { error } = await supabase.from('weekly_goals').insert({
+        user_id: user.id,
+        title: finalTitle,
+        description: desc,
+        time_budget: Number(budget) || 0,
+        category: 'Tactical',
+        priority: 'Medium',
+        progress: 0,
+      });
+
+      if (error) throw error;
+
+      setTitle('');
+      setDesc('');
+      setBudget('');
+      setQuickTask('');
+      setShowModal(false);
+      fetchGoals();
+    } catch (err) {
+      console.error('Error adding goal:', err);
+    }
+  };
+
+  const toggleGoal = async (id: string, completed: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('weekly_goals')
+        .update({
+          completed: !completed,
+          progress: !completed ? 100 : 0
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+      setGoals(goals.map(g => g.id === id ? { ...g, completed: !completed, progress: !completed ? 100 : 0 } : g));
+    } catch (err) {
+      console.error('Error toggling goal:', err);
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    if (!confirm('Delete this goal?')) return;
+    try {
+      const { error } = await supabase
+        .from('weekly_goals')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setGoals(goals.filter(g => g.id !== id));
+    } catch (err) {
+      console.error('Error deleting goal:', err);
+    }
+  };
+
+  const activeGoals = goals.filter(g => !g.completed).sort((a, b) => b.progress - a.progress);
+  const completedGoals = goals.filter(g => g.completed);
+
+  const clearCompleted = async () => {
+    if (!confirm('Clear all completed goals?')) return;
+    try {
+      const ids = completedGoals.map(g => g.id);
+      const { error } = await supabase
+        .from('weekly_goals')
+        .delete()
+        .in('id', ids);
+
+      if (error) throw error;
+      setGoals(goals.filter(g => !g.completed));
+    } catch (err) {
+      console.error('Error clearing goals:', err);
+    }
+  };
+
+  const consistencyScore = goals.length > 0 ? Math.round((goals.filter(g => g.progress > 0).length / goals.length) * 100) : 0;
 
   return (
-    <div className="w-full animate-[slideUp_0.6s_ease-out_both]">
-      <div className="mb-10 md:mb-12">
-        <h1 className="text-4xl md:text-6xl font-black text-cyan-600 dark:text-cyan-400 mb-2 md:mb-3 tracking-tighter">Goal Architect</h1>
-        <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium max-w-xl">Break your long-term vision into concrete, high-leverage weekly targets.</p>
+    <div className="animate-[slideUp_0.5s_ease-out_both] w-full">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">Weekly Goals</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-normal">Track your weekly targets and progress.</p>
+        </div>
       </div>
 
-      {/* Weekly Goals Card */}
-      <div className="glass p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border-slate-200 dark:border-white/10 mb-8 md:mb-12 animate-[scaleIn_0.6s_ease-out_both_0.2s] relative overflow-hidden group shadow-sm">
-        <div className="absolute top-0 right-0 p-8 md:p-12 text-cyan-500/5 dark:text-cyan-400/5 group-hover:scale-110 transition-transform hidden sm:block">
-          <svg className="w-32 h-32 md:w-40 md:h-40" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </div>
-
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 md:mb-12 relative z-10">
-          <div className="flex items-center gap-3 md:gap-4">
-             <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border-2 md:border-4 border-cyan-500/20 dark:border-cyan-400/20 flex items-center justify-center shadow-lg">
-                <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></div>
-             </div>
-             <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">This Week's Goals</h3>
+      {/* Active Goals */}
+      <div className="bg-white dark:bg-white/[0.03] p-5 md:p-6 rounded-xl border border-slate-200 dark:border-white/[0.06] mb-6 animate-[scaleIn_0.4s_ease-out_both_0.1s]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></div>
+            <div>
+              <h3 className="text-base font-semibold text-slate-900 dark:text-white">Active Goals</h3>
+              <p className="text-xs text-slate-500 font-medium">Consistency: {consistencyScore}%</p>
+            </div>
           </div>
-          <button 
+          <button
             onClick={() => setShowModal(true)}
-            className="w-full md:w-auto px-6 py-3.5 md:px-8 md:py-4 bg-cyan-500 dark:bg-cyan-400 text-white dark:text-slate-950 text-sm md:text-base font-black rounded-2xl flex items-center justify-center gap-3 hover:bg-cyan-600 dark:hover:bg-cyan-300 transition-all shadow-xl shadow-cyan-500/30 active:scale-95"
+            className="w-full md:w-auto px-4 py-2 bg-cyan-500 dark:bg-cyan-500 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-cyan-600 dark:hover:bg-cyan-400 transition-all active:scale-95"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" /></svg>
-            Add Milestone
-          </button>
-        </div>
-        
-        <div className="h-1.5 md:h-2 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden mb-12 md:mb-16">
-           <div className="h-full w-0 bg-cyan-500 dark:bg-cyan-400 transition-all duration-1000 group-hover:w-[5%]"></div>
-        </div>
-        
-        <div className="flex flex-col items-center justify-center py-12 md:py-20 text-center">
-           <div className="w-16 h-16 md:w-24 md:h-24 bg-slate-100 dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-5 md:mb-6 text-slate-300 dark:text-slate-700">
-             <svg className="w-8 h-8 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>
-           </div>
-           <p className="text-slate-500 dark:text-slate-500 text-base md:text-lg font-bold">The canvas is blank. What's the biggest win this week?</p>
-        </div>
-        
-        <div className="flex justify-end gap-2 text-[9px] md:text-[11px] text-slate-400 dark:text-slate-700 font-black uppercase tracking-[0.2em] mt-6 md:mt-8">
-           <span>Completion</span>
-           <span className="text-cyan-600 dark:text-cyan-400">0%</span>
-        </div>
-      </div>
-
-      {/* Daily Roadmap */}
-      <div className="glass p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border-slate-200 dark:border-white/10 animate-[slideUp_0.7s_ease-out_both_0.4s] shadow-sm">
-        <div className="flex justify-between items-end mb-10 md:mb-12">
-          <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">Execution Roadmap</h3>
-          <p className="hidden sm:block text-[10px] md:text-xs font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Select Day</p>
-        </div>
-        
-        {/* Scrollable Day Picker for Mobile */}
-        <div className="flex overflow-x-auto pb-4 md:pb-0 gap-3 md:gap-4 mb-10 md:mb-12 custom-scrollbar snap-x">
-           {days.map((day, i) => (
-             <button key={i} className={`flex-1 min-w-[80px] md:min-w-[100px] flex flex-col items-center justify-center p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] transition-all transform hover:-translate-y-1 snap-start ${day.active ? 'bg-cyan-500 dark:bg-cyan-400 text-white dark:text-slate-950 shadow-xl shadow-cyan-500/20' : 'glass border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5'}`}>
-                <span className="text-[9px] md:text-[11px] uppercase font-black tracking-widest mb-1">{day.name}</span>
-                <span className="text-xl md:text-2xl font-black">{day.date}</span>
-             </button>
-           ))}
-        </div>
-
-        <div className="h-1 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden mb-10 md:mb-12">
-           <div className="h-full w-0 bg-cyan-500/50 dark:bg-cyan-400/50"></div>
-        </div>
-        
-        <div className="relative mb-12 md:mb-16">
-          <input 
-            type="text" 
-            placeholder="Next step?" 
-            className="w-full h-16 md:h-20 pl-6 md:pl-10 pr-20 md:pr-24 bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-[2rem] md:rounded-[2.5rem] text-slate-900 dark:text-white text-base md:text-xl placeholder-slate-300 dark:placeholder-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-bold transition-all shadow-sm"
-          />
-          <button className="absolute right-2 md:right-3 top-2 md:top-3 w-12 h-12 md:w-14 md:h-14 bg-cyan-500 dark:bg-cyan-400 text-white dark:text-slate-950 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center hover:bg-cyan-600 dark:hover:bg-cyan-300 transition-all shadow-xl active:scale-95">
-            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M12 4v16m8-8H4" /></svg>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
+            Add Goal
           </button>
         </div>
 
-        <div className="flex flex-col items-center justify-center py-6 md:py-10 opacity-30">
-           <p className="text-slate-400 dark:text-slate-500 font-bold tracking-widest uppercase text-[9px] md:text-xs text-center">Awaiting Objectives for February 14</p>
-        </div>
+        {activeGoals.length === 0 && !loading ? (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center mb-4 text-slate-300 dark:text-slate-700">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4" /></svg>
+            </div>
+            <p className="text-slate-500 dark:text-slate-500 text-sm font-normal">No goals yet. What do you want to achieve this week?</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {activeGoals.map((goal) => (
+              <div key={goal.id} className={`p-3 md:p-4 bg-slate-50 dark:bg-white/[0.02] rounded-lg border border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all group flex items-center gap-3 ${goal.completed ? 'opacity-60' : ''}`}>
+                <button
+                  onClick={() => toggleGoal(goal.id, goal.completed)}
+                  className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 ${goal.completed ? 'bg-cyan-500 border-cyan-500 text-white' : 'border-slate-200 dark:border-white/10 text-transparent hover:border-cyan-400'}`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                </button>
+                <div className="flex-1 min-w-0">
+                  <h4 className={`text-sm font-medium text-slate-900 dark:text-white ${goal.completed ? 'line-through' : ''}`}>{goal.title}</h4>
+                  <p className="text-xs text-slate-500 font-normal">{goal.category} · {goal.time_budget}h budget</p>
+                </div>
+                <button
+                  onClick={() => deleteGoal(goal.id)}
+                  className="p-1.5 text-slate-300 hover:text-red-500 transition-colors flex-shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Quick Add */}
+      <div className="relative mb-8">
+        <input
+          type="text"
+          value={quickTask}
+          onChange={(e) => setQuickTask(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && addGoal()}
+          placeholder="Quick add — type a goal and press Enter..."
+          className="w-full h-11 md:h-12 pl-4 md:pl-5 pr-14 bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-normal transition-all"
+        />
+        <button
+          onClick={() => addGoal()}
+          className="absolute right-1.5 top-1.5 w-8 h-8 md:w-9 md:h-9 bg-cyan-500 dark:bg-cyan-500 text-white rounded-lg flex items-center justify-center hover:bg-cyan-600 dark:hover:bg-cyan-400 transition-all active:scale-95"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" /></svg>
+        </button>
+      </div>
+
+      {/* Completed Goals */}
+      {completedGoals.length > 0 && (
+        <div className="mb-8 animate-[slideUp_0.4s_ease-out_both_0.3s]">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Completed</h3>
+            <div className="flex items-center gap-3">
+              <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">{completedGoals.length} done</span>
+              <button
+                onClick={clearCompleted}
+                className="text-xs text-slate-400 hover:text-red-500 font-medium transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {completedGoals.map((goal) => {
+              const daysToComplete = Math.ceil((new Date().getTime() - new Date(goal.created_at).getTime()) / (1000 * 60 * 60 * 24));
+              return (
+                <div key={goal.id} className="p-4 bg-white dark:bg-white/[0.03] rounded-xl border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 transition-all group relative">
+                  <div className="absolute top-3 right-3 flex items-center gap-2">
+                    <button
+                      onClick={() => deleteGoal(goal.id)}
+                      className="p-1.5 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                    <svg className="w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <div className="mb-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">{goal.category}</p>
+                    </div>
+                    <h4 className="text-sm font-medium text-slate-900 dark:text-white line-clamp-2">{goal.title}</h4>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-normal">Completed in {daysToComplete}d</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">100%</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-slate-950/60 dark:bg-slate-950/90 backdrop-blur-xl animate-[fadeIn_0.3s_ease-out]">
-          <div className="glass w-full max-w-2xl rounded-[2.5rem] md:rounded-[3.5rem] border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden animate-[scaleIn_0.4s_ease-out] max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-950">
-            <button 
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/50 dark:bg-slate-950/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/10 shadow-xl relative overflow-hidden animate-[scaleIn_0.3s_ease-out] max-h-[90vh] overflow-y-auto">
+            <button
               onClick={() => setShowModal(false)}
-              className="absolute top-6 right-6 md:top-10 md:right-10 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-white/5"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <div className="p-8 md:p-16">
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-8 md:mb-10">Architect Weekly Goal</h2>
-              <form className="space-y-6 md:space-y-8" onSubmit={(e) => { e.preventDefault(); setShowModal(false); }}>
+            <div className="p-6 md:p-8">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Add Goal</h2>
+              <form className="space-y-4" onSubmit={addGoal}>
                 <div>
-                  <label className="block text-[10px] md:text-sm font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3 md:mb-4">Goal Vision</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g., Scale to 10k MRR" 
-                    className="w-full h-14 md:h-16 px-6 md:px-8 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white text-lg md:text-xl placeholder-slate-300 dark:placeholder-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-bold"
+                  <label className="block text-xs text-slate-500 dark:text-slate-500 font-medium mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g., Launch MVP this week"
+                    className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-lg text-slate-900 dark:text-white text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-normal"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] md:text-sm font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3 md:mb-4">Tactical Details</label>
-                  <textarea 
-                    placeholder="Specific actions required..." 
+                  <label className="block text-xs text-slate-500 dark:text-slate-500 font-medium mb-2">Description</label>
+                  <textarea
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                    placeholder="What needs to be done..."
                     rows={3}
-                    className="w-full p-6 md:p-8 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-3xl text-slate-900 dark:text-white text-base md:text-lg placeholder-slate-300 dark:placeholder-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-medium resize-none"
+                    className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-lg text-slate-900 dark:text-white text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-normal resize-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] md:text-sm font-black text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-3 md:mb-4">Time Budget (Hrs)</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g., 20" 
-                    className="w-full h-14 md:h-16 px-6 md:px-8 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-900 dark:text-white text-lg md:text-xl placeholder-slate-300 dark:placeholder-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-bold"
+                  <label className="block text-xs text-slate-500 dark:text-slate-500 font-medium mb-2">Time Budget (hours)</label>
+                  <input
+                    type="number"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                    placeholder="e.g., 20"
+                    className="w-full h-10 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-lg text-slate-900 dark:text-white text-sm placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400/30 font-normal"
                   />
                 </div>
-                <button type="submit" className="w-full h-16 md:h-20 bg-slate-900 dark:bg-cyan-400 text-white dark:text-slate-950 font-black text-lg md:text-xl rounded-2xl hover:bg-cyan-600 dark:hover:bg-cyan-300 transition-all shadow-2xl active:scale-[0.98] mt-4">
-                  Commit to Goal
+                <button type="submit" className="w-full h-10 bg-slate-900 dark:bg-cyan-500 text-white font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-cyan-400 transition-all active:scale-[0.98] text-sm mt-2">
+                  Save Goal
                 </button>
               </form>
             </div>

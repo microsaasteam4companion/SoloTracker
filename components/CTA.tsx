@@ -16,20 +16,17 @@ const CTA: React.FC<CTAProps> = ({ onStart }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-[900] text-white mb-8 mt-4 leading-tight tracking-tighter">
             Ready to <span className="text-cyan-100 dark:text-cyan-400 drop-shadow-md">10x Your Growth?</span>
           </h2>
-          
-          <p className="text-lg md:text-xl text-white/90 dark:text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed font-bold">
-            Join thousands of solo founders who are transforming their productivity and 
-            building successful businesses with FounderFlow AI.
-          </p>
+
+          <p className="text-cyan-100/80 text-base sm:text-lg mb-10 max-w-2xl mx-auto font-medium">Join SoloPilot today and stop playing small. Build with obsession. Grow with precision.</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto mb-8">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
+            <input
+              type="email"
+              placeholder="Enter your email"
               className="w-full h-14 px-8 rounded-full bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all backdrop-blur-md font-bold"
             />
             <button onClick={onStart} className="w-full sm:w-auto whitespace-nowrap h-14 px-10 bg-white text-cyan-600 dark:text-slate-950 font-black rounded-full transition-all hover:bg-cyan-50 hover:scale-105 active:scale-95 shadow-xl">
@@ -51,7 +48,7 @@ const CTA: React.FC<CTAProps> = ({ onStart }) => {
               Early access priority
             </div>
           </div>
-          
+
           {/* Decorative radial overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.2),_transparent_40%)] pointer-events-none"></div>
         </AnimatedSection>
