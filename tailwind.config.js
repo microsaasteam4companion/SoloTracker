@@ -9,6 +9,9 @@ export default {
     darkMode: 'class',
     theme: {
         extend: {
+            fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+            },
             animation: {
                 'shimmer': 'shimmer 3s linear infinite',
                 'gradient-x': 'gradient-x 5s ease infinite',
