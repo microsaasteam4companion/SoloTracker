@@ -73,15 +73,25 @@ const App: React.FC = () => {
     };
 
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const activeUser = session?.user ?? null;
-      setUser(activeUser);
-      if (activeUser) {
-        setView('DASHBOARD');
-        fetchTheme(activeUser.id);
+    const checkSession = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Session fetch timeout')), 3000)
+        );
+        const { data: { session } } = await Promise.race([supabase.auth.getSession(), timeoutPromise]) as any;
+        const activeUser = session?.user ?? null;
+        setUser(activeUser);
+        if (activeUser) {
+          setView('DASHBOARD');
+          await fetchTheme(activeUser.id);
+        }
+      } catch (err) {
+        console.error('SoloPilot: Auth initialization error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+    checkSession();
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
