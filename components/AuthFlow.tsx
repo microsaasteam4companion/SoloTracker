@@ -27,6 +27,13 @@ const AuthFlow: React.FC<AuthFlowProps> = ({ onBack, onSuccess }) => {
           password,
         });
         if (signupError) throw signupError;
+
+        if (data.user && !data.session) {
+          setError('Success! Please check your email to verify your account before logging in.');
+          setLoading(false);
+          return;
+        }
+
         if (data.user) {
           onSuccess(data.user.email || email);
         }
@@ -45,6 +52,7 @@ const AuthFlow: React.FC<AuthFlowProps> = ({ onBack, onSuccess }) => {
     } finally {
       setLoading(false);
     }
+
   };
 
   return (

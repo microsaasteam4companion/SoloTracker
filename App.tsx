@@ -101,7 +101,9 @@ const App: React.FC = () => {
         setView('DASHBOARD');
         fetchTheme(activeUser.id);
       } else {
-        setView('LANDING');
+        // Only force LANDING if we are currently on the DASHBOARD
+        // This ensures the user stays on the AUTH or BLOGS page if they aren't logged in
+        setView(prev => prev === 'DASHBOARD' ? 'LANDING' : prev);
       }
     });
 
