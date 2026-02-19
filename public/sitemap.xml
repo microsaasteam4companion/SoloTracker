@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- ==================== MAIN PAGES ==================== -->
+
+  <!-- Homepage / Landing Page -->
+  <url>
+    <loc>https://solopilot.entrext.com/</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Blogs Page -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blogs</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Features Section -->
+  <url>
+    <loc>https://solopilot.entrext.com/#features</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Pricing Section -->
+  <url>
+    <loc>https://solopilot.entrext.com/#pricing</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- FAQ Section -->
+  <url>
+    <loc>https://solopilot.entrext.com/#faq</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://solopilot.entrext.com/#privacy</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://solopilot.entrext.com/#terms</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- ==================== BLOG POSTS (Featured) ==================== -->
+
+  <!-- Blog: The Lonely CEO: Why Solo-Entrepreneurship is a Mental Battle -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/m1</loc>
+    <lastmod>2026-02-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog: From Burnout to $10k MRR: How I Reclaimed My Focus -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/m2</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog: How to Enter Flow State: A Step-by-Step Guide for Developers -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/s1</loc>
+    <lastmod>2026-02-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog: Why the 8-Hour Workday is Dead for Solo Founders -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/v1</loc>
+    <lastmod>2026-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog: How I Used SoloPilot to Finish My MVP in 7 Days -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/p1</loc>
+    <lastmod>2026-02-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ==================== BLOG POSTS (Generated Series) ==================== -->
+
+  <!-- Blog: Why 90% of Projects Fail -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-0</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: The Cost of Distraction -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-1</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: The Power of a Calm Mind -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-2</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Family and Startups: The Balance -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-3</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Busy vs Productive -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-4</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Deep Work Masterclass -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-5</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Weekly Goal Mastery -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-6</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Build in Public Guide -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-7</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Automate with AI -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-8</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Context Switching Tax -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-9</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Strategic ROI Planning -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-10</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Scaling Roadmap -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-11</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Monk Mode Protocol -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-12</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: 2026 Productivity Science -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-13</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Fake Work vs Real Work -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-14</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Psychology of Streaks -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-15</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: High-Leverage Tasks -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-16</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Outcome-as-a-Service -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-17</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Finish MVP in 7 Days -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-18</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Why We Built a Cockpit -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-19</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Streak System Secrets -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-20</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Reaching Goals 2x Faster -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-21</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Builder to Pilot -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-22</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Solo Founder Stack -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-23</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Marketing for Coders -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-24</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: Technical Debt for Solos -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-25</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog: The Freedom of micro-SaaS -->
+  <url>
+    <loc>https://solopilot.entrext.com/#blog/gen-26</loc>
+    <lastmod>2026-02-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

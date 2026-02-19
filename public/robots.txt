@@ -1,0 +1,11 @@
+# SoloPilot - robots.txt
+# https://solopilot.entrext.com
+
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /admin
+
+# Sitemap location
+Sitemap: https://solopilot.entrext.com/sitemap.xml
