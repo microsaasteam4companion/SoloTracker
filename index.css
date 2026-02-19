@@ -1,40 +1,8 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
-  }
-
-  .light .glass {
-    @apply bg-white/75 border-slate-900/10;
-  }
-
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-cyan-600;
-  }
-}
-
-@layer base {
-  body {
-    @apply dark:bg-slate-950 bg-slate-50 transition-colors duration-500 font-inter antialiased;
-  }
-
-  ::-webkit-scrollbar {
-    @apply w-2;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-slate-800 rounded-full;
-  }
-
-  .light ::-webkit-scrollbar-thumb {
-    @apply bg-slate-200;
-  }
+body {
+  background-color: #020617;
+  color: white;
 }

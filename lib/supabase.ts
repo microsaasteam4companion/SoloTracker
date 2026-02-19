@@ -1,11 +1,18 @@
 /// <reference types="vite/client" />
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+let supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-    console.warn('SoloPilot: Supabase environment variables are missing! Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in Vercel (with the VITE_ prefix).');
+// Fallback to placeholders if missing or invalid
+if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
+    console.warn('SoloPilot: Supabase URL is missing or invalid. Using placeholder.');
+    supabaseUrl = 'https://placeholder.supabase.co';
+}
+if (!supabaseAnonKey) {
+    console.warn('SoloPilot: Supabase Anon Key is missing. Using placeholder.');
+    supabaseAnonKey = 'placeholder-key';
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+

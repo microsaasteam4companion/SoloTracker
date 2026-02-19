@@ -128,6 +128,24 @@ const App: React.FC = () => {
     setView('LANDING');
   };
 
+  // Simple Error Boundary logic for the main render
+  const [renderError, setRenderError] = useState<string | null>(null);
+
+  if (renderError) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-black text-white mb-4">ENGINE FAILURE</h1>
+        <p className="text-slate-400 text-sm mb-8 max-w-md">{renderError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-2 bg-cyan-500 text-slate-950 font-black rounded-lg text-xs uppercase"
+        >
+          Reboot System
+        </button>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-cyan-500 font-black tracking-tighter text-2xl animate-pulse">
@@ -136,80 +154,85 @@ const App: React.FC = () => {
     );
   }
 
-  if (view === 'AUTH') {
-    return <AuthFlow onBack={() => setView('LANDING')} onSuccess={handleAuthSuccess} />;
-  }
+  try {
+    if (view === 'AUTH') {
+      return <AuthFlow onBack={() => setView('LANDING')} onSuccess={handleAuthSuccess} />;
+    }
 
-  if (view === 'DASHBOARD' && user) {
-    const username = user.email?.split('@')[0] || 'Explorer';
-    return (
-      <DashboardLayout
-        username={username}
-        activeTab={dashTab}
-        onTabChange={setDashTab}
-        onLogout={handleLogout}
-      >
-        {dashTab === 'DASHBOARD' && <Overview user={user} />}
-        {dashTab === 'DEEP_WORK' && <DeepWork user={user} />}
-        {dashTab === 'GOALS' && <WeeklyGoals user={user} />}
+    if (view === 'DASHBOARD' && user) {
+      const username = user.email?.split('@')[0] || 'Explorer';
+      return (
+        <DashboardLayout
+          username={username}
+          activeTab={dashTab}
+          onTabChange={setDashTab}
+          onLogout={handleLogout}
+        >
+          {dashTab === 'DASHBOARD' && <Overview user={user} />}
+          {dashTab === 'DEEP_WORK' && <DeepWork user={user} />}
+          {dashTab === 'GOALS' && <WeeklyGoals user={user} />}
 
-        {dashTab === 'ANALYTICS' && <Analytics user={user} />}
-        {dashTab === 'STRATEGIC' && <StrategicIntelligence user={user} />}
-        {dashTab === 'SETTINGS' && <SettingsPage user={user} theme={theme} setTheme={setTheme} />}
-        {dashTab === 'ADMIN' && <Admin username={username} />}
-      </DashboardLayout>
-    );
-  }
+          {dashTab === 'ANALYTICS' && <Analytics user={user} />}
+          {dashTab === 'STRATEGIC' && <StrategicIntelligence user={user} />}
+          {dashTab === 'SETTINGS' && <SettingsPage user={user} theme={theme} setTheme={setTheme} />}
+          {dashTab === 'ADMIN' && <Admin username={username} />}
+        </DashboardLayout>
+      );
+    }
 
-  if (view === 'PRIVACY' || view === 'TERMS') {
-    return <LegalPage type={view} onBack={() => setView('LANDING')} />;
-  }
+    if (view === 'PRIVACY' || view === 'TERMS') {
+      return <LegalPage type={view} onBack={() => setView('LANDING')} />;
+    }
 
-  if (view === 'BLOGS') {
-    return (
-      <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
-        <div className="pt-20 px-6 max-w-7xl mx-auto">
-          <button
-            onClick={() => setView('LANDING')}
-            className="flex items-center gap-2 text-cyan-500 font-bold text-xs uppercase tracking-widest mb-12 hover:gap-3 transition-all"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-            </svg>
-            Back to Home
-          </button>
+    if (view === 'BLOGS') {
+      return (
+        <div className="bg-slate-50 dark:bg-slate-950 min-h-screen">
+          <div className="pt-20 px-6 max-w-7xl mx-auto">
+            <button
+              onClick={() => setView('LANDING')}
+              className="flex items-center gap-2 text-cyan-500 font-bold text-xs uppercase tracking-widest mb-12 hover:gap-3 transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+              </svg>
+              Back to Home
+            </button>
+          </div>
+          <Blogs />
         </div>
-        <Blogs />
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 overflow-x-hidden transition-colors duration-500">
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+          <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-cyan-500/10 dark:bg-cyan-900/20 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-500/10 dark:bg-cyan-900/10 blur-[120px] rounded-full"></div>
+        </div>
+
+        <Navbar
+          scrolled={scrolled}
+          onAuth={() => setView('AUTH')}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onNavigate={(v) => setView(v as View)}
+        />
+
+        <main>
+          <Hero onStart={() => setView('AUTH')} />
+          <DashboardShowcase />
+          <Features />
+          <Pricing onStart={() => setView('AUTH')} />
+          <FAQ />
+        </main>
+
+        <Footer onNavigate={(v) => setView(v as View)} />
       </div>
     );
+  } catch (err: any) {
+    setRenderError(err.message || 'Unknown render error');
+    return null;
   }
-
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 overflow-x-hidden transition-colors duration-500">
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-cyan-500/10 dark:bg-cyan-900/20 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-500/10 dark:bg-cyan-900/10 blur-[120px] rounded-full"></div>
-      </div>
-
-      <Navbar
-        scrolled={scrolled}
-        onAuth={() => setView('AUTH')}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        onNavigate={(v) => setView(v as View)}
-      />
-
-      <main>
-        <Hero onStart={() => setView('AUTH')} />
-        <DashboardShowcase />
-        <Features />
-        <Pricing onStart={() => setView('AUTH')} />
-        <FAQ />
-      </main>
-
-      <Footer onNavigate={(v) => setView(v as View)} />
-    </div>
-  );
 };
 
 export default App;

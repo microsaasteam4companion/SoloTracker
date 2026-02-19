@@ -26,7 +26,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('GLOBAL ERROR:', message, error);
+            // On blackout, show an alert to the user if it's a critical crash
+            if (window.confirm('A critical error occurred: ' + message + '\n\nWould you like to try to reload?')) {
+                window.location.reload();
+            }
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('UNHANDLED REJECTION:', event.reason);
+        });
+    </script>
 </head>
+
 <body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
