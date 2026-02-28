@@ -95,7 +95,7 @@ const LegalPage: React.FC<LegalPageProps> = ({ type, onBack }) => {
 
                 <div className="mt-20 pt-12 border-t border-slate-200 dark:border-white/10 text-center">
                     <p className="text-slate-400 text-sm italic">
-                        Questions? Contact us at support@solopilot.ai
+                        Questions? Contact us at business@entrext.in
                     </p>
                 </div>
             </div>

@@ -8,15 +8,27 @@ interface NavbarProps {
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   onNavigate?: (view: string) => void;
+  isLoggedIn?: boolean;
+  isPaid?: boolean;
+  onLogout?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ scrolled, onAuth, theme, onToggleTheme, onNavigate }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  scrolled,
+  onAuth,
+  theme,
+  onToggleTheme,
+  onNavigate,
+  isLoggedIn,
+  isPaid,
+  onLogout
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'py-3 md:py-4 glass border-b shadow-lg shadow-cyan-500/5' : 'py-5 md:py-6 bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'py-3 md:py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-cyan-500/5' : 'py-5 md:py-6 bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Logo
           className="scale-90 md:scale-100"
@@ -42,8 +54,30 @@ const Navbar: React.FC<NavbarProps> = ({ scrolled, onAuth, theme, onToggleTheme,
             )}
           </button>
 
-          <button onClick={onAuth} className="hidden sm:block text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Login</button>
-          <button onClick={onAuth} className="px-4 py-2 md:px-6 md:py-2.5 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 text-sm font-black rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/20">
+          {isLoggedIn ? (
+            <>
+              <button
+                onClick={() => {
+                  if (isPaid) onNavigate?.('DASHBOARD');
+                  else document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="hidden sm:block text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                Dashboard
+              </button>
+              <button onClick={onLogout} className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors uppercase tracking-widest hidden sm:block">Logout</button>
+            </>
+          ) : (
+            <button onClick={onAuth} className="hidden sm:block text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Login</button>
+          )}
+
+          <button
+            onClick={() => {
+              if (isLoggedIn && isPaid) onNavigate?.('DASHBOARD');
+              else document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 md:px-6 md:py-2.5 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 text-sm font-black rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/20"
+          >
             Get Started
           </button>
 

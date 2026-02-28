@@ -22,7 +22,8 @@ import LegalPage from '@/components/LegalPage';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 
-type View = 'LANDING' | 'AUTH' | 'DASHBOARD' | 'PRIVACY' | 'TERMS' | 'BLOGS';
+type View = 'LANDING' | 'AUTH' | 'DASHBOARD' | 'PRIVACY' | 'TERMS' | 'BLOGS' | 'REDIRECTING';
+const LANDING: View = 'LANDING';
 type DashboardTab = 'DASHBOARD' | 'DEEP_WORK' | 'GOALS' | 'ANALYTICS' | 'STRATEGIC' | 'SETTINGS' | 'ADMIN';
 
 const App: React.FC = () => {
@@ -35,6 +36,7 @@ const App: React.FC = () => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
     return (saved === 'light' || saved === 'dark') ? saved : 'dark';
   });
+  const [isPaid, setIsPaid] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,21 +58,30 @@ const App: React.FC = () => {
     }
   }, [theme]);
 
-  useEffect(() => {
-    const fetchTheme = async (userId: string) => {
-      try {
-        const { data } = await supabase
-          .from('user_settings')
-          .select('theme')
-          .eq('user_id', userId)
-          .single();
-        if (data?.theme) {
-          setTheme(data.theme);
-        }
-      } catch (err) {
-        console.error('Error fetching theme:', err);
+  const fetchUserSettings = async (userId: string) => {
+    try {
+      // Use .maybeSingle() to avoid error noise if record doesn't exist yet
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('theme, is_paid')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('SoloPilot: Settings fetch error (ignoring for new users):', error.message);
+        return;
       }
-    };
+
+      if (data) {
+        if (data.theme) setTheme(data.theme);
+        setIsPaid(!!data.is_paid);
+      }
+    } catch (err) {
+      console.error('SoloPilot: Critical error in fetchUserSettings:', err);
+    }
+  };
+
+  useEffect(() => {
 
     // Check active sessions and sets the user
     const checkSession = async () => {
@@ -83,7 +94,7 @@ const App: React.FC = () => {
         setUser(activeUser);
         if (activeUser) {
           setView('DASHBOARD');
-          await fetchTheme(activeUser.id);
+          await fetchUserSettings(activeUser.id);
         }
       } catch (err) {
         console.error('SoloPilot: Auth initialization error:', err);
@@ -92,23 +103,95 @@ const App: React.FC = () => {
       }
     };
     checkSession();
+  }, []);
 
+  // Handle post-payment polling
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('payment_success') === 'true' && user && !isPaid) {
+      const interval = setInterval(() => {
+        fetchUserSettings(user.id);
+      }, 3000);
+
+      // Stop polling after 45 seconds or if isPaid becomes true
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 45000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [user, isPaid]);
+
+  useEffect(() => {
+    console.log('SoloPilot: Initializing Auth Listener');
     // Listen for changes on auth state (logged in, signed out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const activeUser = session?.user ?? null;
+      console.log(`SoloPilot: Auth Event [${event}] triggered. User: ${activeUser?.id || 'None'}`);
+
       setUser(activeUser);
+
       if (activeUser) {
-        setView('DASHBOARD');
-        fetchTheme(activeUser.id);
+        // Fetch settings in background (non-blocking)
+        fetchUserSettings(activeUser.id);
+
+        // Handle pending payment redirect
+        const hasPendingPayment = localStorage.getItem('pending_payment') === 'true';
+        if (hasPendingPayment) {
+          console.log('SoloPilot: Found pending payment, redirecting...');
+          localStorage.removeItem('pending_payment');
+          const checkoutUrl = `https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1&metadata[user_id]=${activeUser.id}`;
+          setView('REDIRECTING');
+          window.location.href = checkoutUrl;
+          return;
+        }
+
+        // Handle URL-based payment success flag
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('payment_success') === 'true') {
+          // Stay in current view or go to dashboard if returning from checkout
+          setView('DASHBOARD');
+          return;
+        }
+
+        // If newly signed in or session is available, go to dashboard
+        const authEvents = ['SIGNED_IN', 'SIGNED_UP', 'INITIAL_SESSION'];
+        if (authEvents.includes(event as string)) {
+          setView('DASHBOARD');
+        }
       } else {
-        // Only force LANDING if we are currently on the DASHBOARD
-        // This ensures the user stays on the AUTH or BLOGS page if they aren't logged in
-        setView(prev => prev === 'DASHBOARD' ? 'LANDING' : prev);
+        // Handle logout or session expiration
+        if (event === 'SIGNED_OUT') {
+          setView('LANDING');
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, []); // Only run once on mount
+
+  // Handle redirection based on payment status
+  useEffect(() => {
+    // Only redirect if we are on the dashboard and we've confirmed the user is NOT paid
+    // Adding a small delay to allow fetchUserSettings to potentially finish
+    if (user && view === 'DASHBOARD' && !isPaid) {
+      const timeout = setTimeout(() => {
+        // Re-check after 1.5 seconds to avoid premature redirection
+        if (!isPaid) {
+          console.log('SoloPilot: Unpaid user on dashboard, redirecting to pricing...');
+          setView('LANDING');
+          setTimeout(() => {
+            document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      }, 1500);
+      return () => clearTimeout(timeout);
+    }
+  }, [isPaid, user, view]);
 
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -157,8 +240,32 @@ const App: React.FC = () => {
   }
 
   try {
+    if (view === 'REDIRECTING') {
+      return (
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+          <h1 className="text-2xl font-black text-white mb-2">Redirecting to Payment...</h1>
+          <p className="text-slate-500">Please do not close this window.</p>
+        </div>
+      );
+    }
+
     if (view === 'AUTH') {
       return <AuthFlow onBack={() => setView('LANDING')} onSuccess={handleAuthSuccess} />;
+    }
+
+    // Payment Success Verification Overlay
+    const params = new URLSearchParams(window.location.search);
+    const isReturningFromPayment = params.get('payment_success') === 'true';
+
+    if (isReturningFromPayment && user && !isPaid) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+          <h1 className="text-2xl font-black text-white mb-2">Verifying Payment...</h1>
+          <p className="text-slate-500">We're confirming your status. Dashboard will open automatically.</p>
+        </div>
+      );
     }
 
     if (view === 'DASHBOARD' && user) {
@@ -173,7 +280,6 @@ const App: React.FC = () => {
           {dashTab === 'DASHBOARD' && <Overview user={user} />}
           {dashTab === 'DEEP_WORK' && <DeepWork user={user} />}
           {dashTab === 'GOALS' && <WeeklyGoals user={user} />}
-
           {dashTab === 'ANALYTICS' && <Analytics user={user} />}
           {dashTab === 'STRATEGIC' && <StrategicIntelligence user={user} />}
           {dashTab === 'SETTINGS' && <SettingsPage user={user} theme={theme} setTheme={setTheme} />}

@@ -62,7 +62,33 @@ VITE_TWITTER_REDIRECT_URI=http://localhost:5173/auth/twitter/callback
 
 ---
 
-### 3. Grok API Setup
+### 3. Google OAuth Setup
+
+**Step 1: Google Cloud Console**
+1. [Google Cloud Console](https://console.cloud.google.com/) pe jao.
+2. Ek project select/create karo.
+3. **APIs & Services > Credentials** me jao.
+4. "Create Credentials" > "OAuth client ID" click karo.
+5. Application type: "Web application".
+6. Configure karo:
+   - **Authorized JavaScript origins**:
+     - `http://localhost:5173`
+     - `https://solopilot.entrext.com`
+   - **Authorized redirect URIs**:
+     - `https://vcqwzdfdnkvvvzooealy.supabase.co/auth/v1/callback`
+
+**Step 2: Supabase Dashboard**
+1. [Supabase Dashboard](https://app.supabase.com/) me jao.
+2. Project select karo: **Authentication > Providers > Google**.
+3. "Enable Google" turn on karo.
+4. Paste karo:
+   - **Client ID**: (Google Cloud Console se milega)
+   - **Client Secret**: (Google Cloud Console se milega)
+5. Save karo.
+
+---
+
+### 4. Grok API Setup
 
 **Step 1: xAI Account**
 1. https://x.ai pe jao

@@ -112,7 +112,7 @@ const DashboardShowcase: React.FC = () => {
                         </div>
 
                         {/* Mobile Phone Mockup - Hyper-Faithful & Responsive */}
-                        <div className="absolute -bottom-6 -right-2 md:-bottom-12 md:right-10 lg:right-20 w-[140px] md:w-[220px] aspect-[9/19] rounded-[2rem] md:rounded-[2.5rem] bg-slate-950 border-[4px] md:border-[6px] border-slate-800 shadow-2xl z-20 group-hover:translate-x-2 md:group-hover:translate-x-4 transition-transform duration-1000 flex flex-col overflow-hidden">
+                        <div className="relative md:absolute -bottom-6 -right-2 md:-bottom-12 md:right-10 lg:right-20 w-[140px] md:w-[220px] aspect-[9/19] rounded-[2rem] md:rounded-[2.5rem] bg-slate-950 border-[4px] md:border-[6px] border-slate-800 shadow-2xl z-20 group-hover:translate-x-2 md:group-hover:translate-x-4 transition-transform duration-1000 flex flex-col overflow-hidden mx-auto mt-6 md:mt-0">
                             {/* Speaker/Sensors Notch */}
                             <div className="h-4 md:h-6 w-16 md:w-20 bg-slate-800 rounded-b-xl md:rounded-b-2xl self-center mb-2 md:mb-4 shrink-0"></div>
 

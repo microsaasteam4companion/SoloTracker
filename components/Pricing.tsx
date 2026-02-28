@@ -4,9 +4,14 @@ import AnimatedSection from './AnimatedSection';
 
 interface PricingProps {
   onStart: () => void;
+  userId?: string;
 }
 
-const Pricing: React.FC<PricingProps> = ({ onStart }) => {
+const Pricing: React.FC<PricingProps> = ({ onStart, userId }) => {
+  const checkoutUrl = userId
+    ? `https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1&metadata[user_id]=${userId}`
+    : 'https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1';
+
   return (
     <section id="pricing" className="py-24 px-6 bg-slate-50 dark:bg-slate-950/50 transition-colors">
       <div className="max-w-7xl mx-auto">
@@ -46,7 +51,17 @@ const Pricing: React.FC<PricingProps> = ({ onStart }) => {
                   ))}
                 </ul>
 
-                <button onClick={onStart} className="w-full py-5 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 font-black rounded-2xl transition-all shadow-xl shadow-cyan-500/20 active:scale-[0.98]">
+                <button
+                  onClick={() => {
+                    if (userId) {
+                      window.open(checkoutUrl, '_blank');
+                    } else {
+                      localStorage.setItem('pending_payment', 'true');
+                      onStart();
+                    }
+                  }}
+                  className="w-full py-5 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 font-black rounded-2xl transition-all shadow-xl shadow-cyan-500/20 active:scale-[0.98]"
+                >
                   Get Started Now
                 </button>
               </div>

@@ -29,7 +29,10 @@ const CTA: React.FC<CTAProps> = ({ onStart }) => {
               placeholder="Enter your email"
               className="w-full h-14 px-8 rounded-full bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all backdrop-blur-md font-bold"
             />
-            <button onClick={onStart} className="w-full sm:w-auto whitespace-nowrap h-14 px-10 bg-white text-cyan-600 dark:text-slate-950 font-black rounded-full transition-all hover:bg-cyan-50 hover:scale-105 active:scale-95 shadow-xl">
+            <button
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full sm:w-auto whitespace-nowrap h-14 px-10 bg-white text-cyan-600 dark:text-slate-950 font-black rounded-full transition-all hover:bg-cyan-50 hover:scale-105 active:scale-95 shadow-xl"
+            >
               Join Waitlist
             </button>
           </div>

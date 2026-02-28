@@ -16,14 +16,14 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-full text-left p-6 rounded-2xl transition-all duration-300 flex items-center justify-between border ${isOpen
                     ? 'bg-cyan-500/10 border-cyan-500/20 shadow-lg shadow-cyan-500/5'
-                    : 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/[0.07]'
+                    : 'bg-white/5 dark:bg-white/5 border-slate-200 dark:border-white/5 hover:border-cyan-500/30 dark:hover:border-white/10 hover:bg-slate-100 dark:hover:bg-white/[0.07]'
                     }`}
             >
-                <span className={`text-lg font-bold tracking-tight ${isOpen ? 'text-cyan-400' : 'text-slate-200'}`}>
+                <span className={`text-lg font-bold tracking-tight ${isOpen ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-900 dark:text-slate-200'}`}>
                     {question}
                 </span>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 ${isOpen ? 'bg-cyan-500/20 rotate-180' : 'bg-white/5'}`}>
-                    <svg className={`w-4 h-4 ${isOpen ? 'text-cyan-400' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 ${isOpen ? 'bg-cyan-500/20 rotate-180' : 'bg-slate-200 dark:bg-white/5'}`}>
+                    <svg className={`w-4 h-4 ${isOpen ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-500 dark:text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                     </svg>
                 </div>
@@ -32,7 +32,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
                     }`}
             >
-                <div className="p-6 text-slate-400 text-lg leading-relaxed bg-white/5 border border-white/5 rounded-2xl">
+                <div className="p-6 text-slate-600 dark:text-slate-400 text-lg leading-relaxed bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl">
                     {answer}
                 </div>
             </div>
@@ -88,7 +88,7 @@ const FAQ: React.FC = () => {
                 <AnimatedSection delay={400} className="mt-16 text-center">
                     <p className="text-slate-500 dark:text-slate-400 font-bold">
                         Still have questions?
-                        <a href="mailto:support@solopilot.ai" className="text-cyan-500 hover:text-cyan-400 ml-2 transition-colors">Contact Ground Control</a>
+                        <a href="mailto:business@entrext.in" className="text-cyan-500 hover:text-cyan-400 ml-2 transition-colors">business@entrext.in</a>
                     </p>
                 </AnimatedSection>
             </div>
