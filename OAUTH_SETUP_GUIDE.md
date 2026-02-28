@@ -118,20 +118,24 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Reddit OAuth
 VITE_REDDIT_CLIENT_ID=your_reddit_client_id
 VITE_REDDIT_CLIENT_SECRET=your_reddit_client_secret
-VITE_REDDIT_REDIRECT_URI=http://localhost:5173/auth/reddit/callback
-
-# Twitter OAuth
-VITE_TWITTER_API_KEY=your_twitter_api_key
-VITE_TWITTER_API_SECRET=your_twitter_api_secret
-VITE_TWITTER_REDIRECT_URI=http://localhost:5173/auth/twitter/callback
-
-# Grok AI
-VITE_GROK_API_KEY=your_grok_api_key
-```
+**Step 3: Site URL Setting (IMPORTANT)**
+1. Supabase Dashboard me **Authentication > Settings** memo jao.
+2. **Site URL** ko `https://solopilot.entrext.com` set karo.
+3. (Optional) **Redirect URIs** me `http://localhost:5173` bhi add karo.
 
 ---
 
-## Next Steps
+### 4. Deployment Check (Vercel/Hosting)
+
+Agar aap Vercel ya kisi aur platform pe deploy kar rahe hain:
+1. **Environment Variables**: Local `.env.local` file git me nahi jati. Isliye platform dashboard (Vercel Settings > Environment Variables) me ye variables manually add karo:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+2. **Client ID/Secret**: Ensure karo ki aapne Supabase dashboard me correct credentials dale hain.
+
+---
+
+### 5. Grok API Setup
 
 Jab aap ye sab credentials add kar lo, tab mujhe batao. Main:
 1. OAuth flow implement karunga (Reddit + Twitter)
