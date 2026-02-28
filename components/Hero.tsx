@@ -31,13 +31,19 @@ const Hero: React.FC<HeroProps> = ({ onStart }) => {
         <AnimatedSection delay={700}>
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
             <button
-              onClick={() => window.open('https://entrextlabs.substack.com/subscribe', '_blank')}
-              className="w-full md:w-auto whitespace-nowrap h-14 md:h-16 px-10 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 font-black text-base md:text-lg rounded-lg transition-all flex items-center justify-center gap-3 group shadow-xl shadow-cyan-500/20 active:scale-95"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full md:w-auto h-14 md:h-16 px-10 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 font-black text-base md:text-lg rounded-lg transition-all flex items-center justify-center gap-3 group shadow-xl shadow-cyan-500/20 active:scale-95"
             >
-              Subscribe Our Newsletter
+              Get Started
               <svg className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
+            </button>
+            <button
+              onClick={() => window.open('https://entrextlabs.substack.com/subscribe', '_blank')}
+              className="w-full md:w-auto px-8 h-14 md:h-16 text-slate-500 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Subscribe Newsletter
             </button>
           </div>
         </AnimatedSection>

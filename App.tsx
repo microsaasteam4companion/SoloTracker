@@ -144,7 +144,7 @@ const App: React.FC = () => {
         if (hasPendingPayment) {
           console.log('SoloPilot: Found pending payment, redirecting...');
           localStorage.removeItem('pending_payment');
-          const checkoutUrl = `https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1&metadata[user_id]=${activeUser.id}`;
+          const checkoutUrl = `https://checkout.dodopayments.com/buy/pdt_0NYtGkj1aAJ15xX7NJss5?session=sess_l7HHK50CDg&quantity=1&metadata[user_id]=${activeUser.id}`;
           setView('REDIRECTING');
           window.location.href = checkoutUrl;
           return;

@@ -9,8 +9,8 @@ interface PricingProps {
 
 const Pricing: React.FC<PricingProps> = ({ onStart, userId }) => {
   const checkoutUrl = userId
-    ? `https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1&metadata[user_id]=${userId}`
-    : 'https://test.checkout.dodopayments.com/buy/pdt_0NYtW8BmCxyMTGE3mvlj8?quantity=1';
+    ? `https://checkout.dodopayments.com/buy/pdt_0NYtGkj1aAJ15xX7NJss5?session=sess_l7HHK50CDg&quantity=1&metadata[user_id]=${userId}`
+    : 'https://checkout.dodopayments.com/buy/pdt_0NYtGkj1aAJ15xX7NJss5?session=sess_l7HHK50CDg&quantity=1';
 
   return (
     <section id="pricing" className="py-24 px-6 bg-slate-50 dark:bg-slate-950/50 transition-colors">
@@ -54,10 +54,10 @@ const Pricing: React.FC<PricingProps> = ({ onStart, userId }) => {
                 <button
                   onClick={() => {
                     if (userId) {
-                      window.open(checkoutUrl, '_blank');
+                      window.location.href = checkoutUrl;
                     } else {
                       localStorage.setItem('pending_payment', 'true');
-                      onStart();
+                      onStart(); // Go to Auth
                     }
                   }}
                   className="w-full py-5 bg-cyan-500 dark:bg-cyan-400 hover:bg-cyan-600 dark:hover:bg-cyan-300 text-white dark:text-slate-950 font-black rounded-2xl transition-all shadow-xl shadow-cyan-500/20 active:scale-[0.98]"

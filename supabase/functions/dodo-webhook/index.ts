@@ -1,38 +1,63 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+// Dodo Payments uses Standard Webhooks (Svix) specification
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
 
-/**
- * Dodo Payments Webhook Handler
- * This function is triggered when a payment is successful.
- * It updates the 'is_paid' column in the 'user_settings' table.
- */
 serve(async (req) => {
-    // CORS Headers
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, webhook-id, webhook-signature, webhook-timestamp',
     }
 
-    // Handle CORS preflight
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
 
     try {
-        const payload = await req.json()
-        console.log("Received Webhook Event:", payload)
+        const webhookSecret = Deno.env.get('DODO_PAYMENTS_WEBHOOK_SECRET')
+        if (!webhookSecret) {
+            throw new Error("DODO_PAYMENTS_WEBHOOK_SECRET is not set")
+        }
 
-        // Extract relevant data from Dodo payload
-        // Note: Dodo metadata keys are passed as metadata[key] in URL but usually flattened in payload
-        const metadata = payload.metadata || {}
+        // Get headers for verification
+        const id = req.headers.get("webhook-id")
+        const timestamp = req.headers.get("webhook-timestamp")
+        const signature = req.headers.get("webhook-signature")
+
+        if (!id || !timestamp || !signature) {
+            console.error("Missing webhook headers")
+            return new Response("Missing headers", { status: 400, headers: corsHeaders })
+        }
+
+        // Get raw body as text for verification
+        const body = await req.text()
+
+        // Verify the webhook signature
+        const wh = new Webhook(webhookSecret)
+        try {
+            wh.verify(body, {
+                "webhook-id": id,
+                "webhook-timestamp": timestamp,
+                "webhook-signature": signature,
+            })
+        } catch (err) {
+            console.error("Signature verification failed:", err.message)
+            return new Response("Invalid signature", { status: 401, headers: corsHeaders })
+        }
+
+        // Signature is valid, parse the body
+        const payload = JSON.parse(body)
+        console.log("Validated Webhook Event:", payload.type)
+
+        // Extract metadata
+        const metadata = payload.data?.metadata || payload.metadata || {}
         const userId = metadata.user_id
-        const eventType = payload.type // e.g., 'payment.succeeded'
 
         if (!userId) {
             console.warn("No user_id found in metadata. Skipping.")
-            return new Response(JSON.stringify({ status: "ignored", reason: "no_user_id" }), {
+            return new Response(JSON.stringify({ status: "ignored" }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
-                status: 200,
+                status: 200
             })
         }
 
@@ -41,25 +66,26 @@ serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-        // Update the user's payment status
-        const { error } = await supabase
-            .from('user_settings')
-            .update({ is_paid: true })
-            .eq('user_id', userId)
+        // Only update on successful payment
+        if (payload.type === 'payment.succeeded') {
+            const { error } = await supabase
+                .from('user_settings')
+                .update({ is_paid: true })
+                .eq('user_id', userId)
 
-        if (error) {
-            console.error("Database Update Error:", error)
-            throw error
+            if (error) {
+                console.error("Database Update Error:", error)
+                throw error
+            }
+            console.log(`Success! Unlocked dashboard for User: ${userId}`)
         }
 
-        console.log(`Success! Updated payment status for User ID: ${userId}`)
-
-        return new Response(JSON.stringify({ status: "success", userId }), {
+        return new Response(JSON.stringify({ status: "success" }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
         })
     } catch (err) {
-        console.error("Webhook Processing Failed:", err.message)
+        console.error("Webhook Error:", err.message)
         return new Response(JSON.stringify({ error: err.message }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 400,
